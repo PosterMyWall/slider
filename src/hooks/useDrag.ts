@@ -55,28 +55,32 @@ export default function useDrag(
     }
   };
 
-  const updateCacheValue = (valueIndex: number, offsetPercent: number) => {
-    // Basic point offset
-
+  const updateCacheValue = (valueIndex: number, offsetPercent: number, overwriteValue?: number) => {
     if (valueIndex === -1) {
-      // >>>> Dragging on the track
-      const startValue = originValues[0];
-      const endValue = originValues[originValues.length - 1];
-      const maxStartOffset = min - startValue;
-      const maxEndOffset = max - endValue;
+      // Determine the closest index to overwriteValue
+      const closestIndex = originValues?.reduce((prevIdx, currVal, currIdx) => {
+        return Math.abs(currVal - overwriteValue) < Math.abs(originValues[prevIdx] - overwriteValue) ? currIdx : prevIdx
+      }, 0)
 
-      // Get valid offset
-      let offset = offsetPercent * (max - min);
-      offset = Math.max(offset, maxStartOffset);
-      offset = Math.min(offset, maxEndOffset);
+      // Calculate the offset
+      const offset = offsetPercent * (max - min)
 
-      // Use first value to revert back of valid offset (like steps marks)
-      const formatStartValue = formatValue(startValue + offset);
-      offset = formatStartValue - startValue;
-      const cloneCacheValues = originValues.map((val) => val + offset);
-      flushValues(cloneCacheValues);
-    } else {
-      // >>>> Dragging on the handle
+      // Apply the offset to the overwriteValue
+      let newValue = overwriteValue + offset
+
+      // Format the new value
+      newValue = formatValue(newValue)
+
+      // Ensure the new value is within the range [min, max]
+      newValue = Math.max(min, Math.min(max, newValue))
+
+      const cloneCacheValues = [...originValues]
+      cloneCacheValues[closestIndex] = newValue
+
+      flushValues(cloneCacheValues)
+    }
+
+    else {
       const offsetDist = (max - min) * offsetPercent;
 
       // Always start with the valueIndex origin value
@@ -89,11 +93,45 @@ export default function useDrag(
     }
   };
 
+  // const updateCacheValue = (valueIndex: number, offsetPercent: number) => {
+  //   // Basic point offset
+  //
+  //   if (valueIndex === -1) {
+  //     // >>>> Dragging on the track
+  //     const startValue = originValues[0];
+  //     const endValue = originValues[originValues.length - 1];
+  //     const maxStartOffset = min - startValue;
+  //     const maxEndOffset = max - endValue;
+  //
+  //     // Get valid offset
+  //     let offset = offsetPercent * (max - min);
+  //     offset = Math.max(offset, maxStartOffset);
+  //     offset = Math.min(offset, maxEndOffset);
+  //
+  //     // Use first value to revert back of valid offset (like steps marks)
+  //     const formatStartValue = formatValue(startValue + offset);
+  //     offset = formatStartValue - startValue;
+  //     const cloneCacheValues = originValues.map((val) => val + offset);
+  //     flushValues(cloneCacheValues);
+  //   } else {
+  //     // >>>> Dragging on the handle
+  //     const offsetDist = (max - min) * offsetPercent;
+  //
+  //     // Always start with the valueIndex origin value
+  //     const cloneValues = [...cacheValues];
+  //     cloneValues[valueIndex] = originValues[valueIndex];
+  //
+  //     const next = offsetValues(cloneValues, offsetDist, valueIndex, 'dist');
+  //
+  //     flushValues(next.values, next.value);
+  //   }
+  // };
+
   // Resolve closure
   const updateCacheValueRef = React.useRef(updateCacheValue);
   updateCacheValueRef.current = updateCacheValue;
 
-  const onStartMove: OnStartMove = (e, valueIndex) => {
+  const onStartMove: OnStartMove = (e, valueIndex, overwriteValue) => {
     e.stopPropagation();
 
     const originValue = rawValues[valueIndex];
@@ -132,6 +170,7 @@ export default function useDrag(
           offSetPercent = offsetX / width;
       }
       updateCacheValueRef.current(valueIndex, offSetPercent);
+      updateCacheValueRef.current(valueIndex, offSetPercent, overwriteValue); // pass overwriteValue
     };
 
     // End
