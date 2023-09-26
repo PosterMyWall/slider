@@ -1,5 +1,5 @@
 {
-  "name": "rc-slider",
+  "name": "@postermywall/slider",
   "version": "10.3.0",
   "description": "Slider UI component for React",
   "engines": {
@@ -33,6 +33,7 @@
   "style": "./assets/index.css",
   "types": "./lib/index.d.ts",
   "scripts": {
+    "release": "npm publish --access public",
     "start": "dumi dev",
     "docs:build": "dumi build",
     "docs:deploy": "gh-pages -d .doc",
