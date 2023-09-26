@@ -317,36 +317,6 @@ const Slider = React.forwardRef((props: SliderProps, ref: React.Ref<SliderRef>) 
     }
   };
 
-  // ============================ Click =============================
-  const onSliderMouseDown: React.MouseEventHandler<HTMLDivElement> = (e) => {
-    e.preventDefault();
-
-    const { width, height, left, top, bottom, right } =
-      containerRef.current.getBoundingClientRect();
-    const { clientX, clientY } = e;
-
-    let percent: number;
-    switch (direction) {
-      case 'btt':
-        percent = (bottom - clientY) / height;
-        break;
-
-      case 'ttb':
-        percent = (clientY - top) / height;
-        break;
-
-      case 'rtl':
-        percent = (right - clientX) / width;
-        break;
-
-      default:
-        percent = (clientX - left) / width;
-    }
-
-    const nextValue = mergedMin + percent * (mergedMax - mergedMin);
-    changeToCloseValue(formatValue(nextValue));
-  };
-
   // =========================== Keyboard ===========================
   const [keyboardValue, setKeyboardValue] = React.useState<number>(null);
 
@@ -491,6 +461,51 @@ const Slider = React.forwardRef((props: SliderProps, ref: React.Ref<SliderRef>) 
     ],
   );
 
+  // ============================ Click =============================
+  const handleStartDrag = (
+    clientX: number,
+    clientY: number,
+    originalEvent: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
+  ) => {
+    const { width, height, left, top, bottom, right } =
+      containerRef.current.getBoundingClientRect()
+
+    let percent: number
+    switch (direction) {
+      case 'btt':
+        percent = (bottom - clientY) / height
+        break
+
+      case 'ttb':
+        percent = (clientY - top) / height
+        break
+
+      case 'rtl':
+        percent = (right - clientX) / width
+        break
+
+      default:
+        percent = (clientX - left) / width
+    }
+
+    const formattedValue = formatValue(mergedMin + percent * (mergedMax - mergedMin))
+    changeToCloseValue(formattedValue)
+    onStartDrag(originalEvent, -1, formattedValue)
+  }
+
+  const onSliderMouseDown: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    e.preventDefault()
+    const { clientX, clientY } = e
+    handleStartDrag(clientX, clientY, e)
+  }
+
+  const onSliderTouchStart: React.TouchEventHandler<HTMLDivElement> = (e) => {
+    e.preventDefault()
+    const touch = e.touches[0]
+    const { clientX, clientY } = touch
+    handleStartDrag(clientX, clientY, e)
+  }
+
   // ============================ Render ============================
   return (
     <SliderContext.Provider value={context}>
@@ -504,6 +519,7 @@ const Slider = React.forwardRef((props: SliderProps, ref: React.Ref<SliderRef>) 
         })}
         style={style}
         onMouseDown={onSliderMouseDown}
+        onTouchStart={onSliderTouchStart}
       >
         <div
           className={cls(`${prefixCls}-rail`, classNames?.rail)}
