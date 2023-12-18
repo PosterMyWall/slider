@@ -1,6 +1,6 @@
 {
   "name": "@postermywall/rc-slider",
-  "version": "10.3.7",
+  "version": "10.3.8",
   "description": "Slider UI component for React",
   "engines": {
     "node": ">=8.x"
