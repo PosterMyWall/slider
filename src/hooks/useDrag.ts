@@ -169,7 +169,7 @@ export default function useDrag(
         default:
           offSetPercent = offsetX / width;
       }
-      updateCacheValueRef.current(valueIndex, offSetPercent);
+      // updateCacheValueRef.current(valueIndex, offSetPercent);
       updateCacheValueRef.current(valueIndex, offSetPercent, overwriteValue); // pass overwriteValue
     };
 
