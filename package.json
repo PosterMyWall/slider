@@ -1,6 +1,6 @@
 {
   "name": "@postermywall/rc-slider",
-  "version": "10.3.12",
+  "version": "10.3.14",
   "description": "Slider UI component for React",
   "engines": {
     "node": ">=8.x"
@@ -38,7 +38,7 @@
     "docs:build": "dumi build",
     "docs:deploy": "gh-pages -d .doc",
     "compile": "father build && lessc assets/index.less assets/index.css",
-    "prepublishOnly": "npm run compile && np --yolo --no-publish",
+    "prepublishOnly": "npm run compile",
     "lint": "eslint src/ --ext .ts,.tsx,.jsx,.js,.md",
     "prettier": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "test": "rc-test",
