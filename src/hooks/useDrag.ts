@@ -84,7 +84,7 @@ export default function useDrag(
       const offsetDist = (max - min) * offsetPercent;
 
       // Always start with the valueIndex origin value
-      const cloneValues = [...cacheValues];
+      const cloneValues = [...rawValues];
       cloneValues[valueIndex] = originValues[valueIndex];
 
       const next = offsetValues(cloneValues, offsetDist, valueIndex, 'dist');
