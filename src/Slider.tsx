@@ -371,6 +371,7 @@ const Slider = React.forwardRef((props: SliderProps, ref: React.Ref<SliderRef>) 
   );
 
   const onStartMove: OnStartMove = (e, valueIndex) => {
+    e.preventDefault()
     onStartDrag(e, valueIndex);
 
     onBeforeChange?.(getTriggerValue(rawValuesRef.current));
